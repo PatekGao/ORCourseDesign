@@ -1,5 +1,5 @@
 # 根据您提供的信息，您可以按照以下步骤来初始化NK_C、NK、L_n_plus、L_n_minus、q_w_plus和q_w_minus：
-from CourseDesign.paramsFromSheet import flightSheet, K, NC
+from CourseDesign.second.paramsFromSheet import flightSheet, K, NC
 
 # 创建空字典NK_C和NK，用于存储航班和机型之间的映射关系。
 # 创建空字典L_n_plus和L_n_minus，用于存储每个节点的正向和反向邻居节点。
