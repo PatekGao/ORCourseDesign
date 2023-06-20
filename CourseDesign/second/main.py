@@ -1,7 +1,7 @@
 import gurobipy as gp
 
-from CourseDesign.init import NK, NK_C, L_n_plus, L_n_minus
-from CourseDesign.paramsFromSheet import L, K, c, M, Lc, p_profits, Lm, Lo
+from CourseDesign.second.init import NK, NK_C, L_n_plus, L_n_minus
+from CourseDesign.second.paramsFromSheet import L, K, c, M, Lc, p_profits, Lm, Lo
 
 # 创建模型
 m = gp.Model()
