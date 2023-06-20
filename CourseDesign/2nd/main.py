@@ -8,8 +8,8 @@ m = gp.Model()
 
 # 定义变量
 x = m.addVars(L, K, vtype=gp.GRB.BINARY, name="x")
-q_plus = m.addVars(N, K, vtype=gp.GRB.INTEGER, name="q_plus")
-q_minus = m.addVars(N, K, vtype=gp.GRB.INTEGER, name="q_minus")
+q_plus = m.addVars(NK_C, K, vtype=gp.GRB.INTEGER, name="q_plus")
+q_minus = m.addVars(NK_C, K, vtype=gp.GRB.INTEGER, name="q_minus")
 q_w_plus = m.addVars(K, vtype=gp.GRB.INTEGER, name="q_w_plus")
 q_w_minus = m.addVars(K, vtype=gp.GRB.INTEGER, name="q_w_minus")
 
@@ -29,7 +29,7 @@ for _l in Lo:
 for n in NK:
     for k in K:
         m.addConstr(
-            gp.quicksum(x[l, k] for l in L_n_plus[n]) + q_plus[n, k] == gp.quicksum(x[l, k] for l in L_n_minus[n]) +
+            gp.quicksum(x[_l, k] for _l in L_n_plus[n]) + q_plus[n, k] == gp.quicksum(x[_l, k] for _l in L_n_minus[n]) +
             q_minus[n, k], name="flow_balance_{}_{}".format(n, k))
 
 for k in K:

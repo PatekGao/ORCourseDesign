@@ -1,0 +1,69 @@
+在已知起飞机场和目的机场和和起飞时间和到达时间，还有是否为必要航班的时候，如何初始化NK_C，NK，L_n_plus，L_n_minus，q_w_plus，q_w_minus
+
+根据您提供的信息，您可以按照以下步骤初始化NK_C、NK、L_n_plus、L_n_minus、q_w_plus和q_w_minus：
+
+创建一个空字典NKC_dict，用于存储机型在特定节点上穿越计数时间线的节点集合。
+创建一个空字典NK，用于存储机型在时空网络中的节点集合。
+创建两个空列表L_n_plus和L_n_minus，用于存储所有节点的正向和反向邻居节点。
+创建两个空字典q_w_plus和q_w_minus，用于存储所有节点的正向和反向邻居节点的转移概率。
+遍历所有航班，对于每个航班，根据其起飞机场、目的机场、起飞时间和到达时间，计算出该航班的起飞节点和到达节点，并将其添加到NKC_dict和NK中。
+遍历所有节点，对于每个节点，计算出其正向和反向邻居节点，并将其添加到L_n_plus和L_n_minus中。
+遍历所有节点，对于每个节点，计算出其正向和反向邻居节点的转移概率，并将其添加到q_w_plus和q_w_minus中。
+以下是一个示例代码，用于实现上述步骤：
+# 假设您已经将所有航班存储在一个列表中，名为flights
+# 假设起飞机场、目的机场、起飞时间和到达时间分别存储在flight['origin']、flight['destination']、flight['departure_time']和flight['arrival_time']中
+# 假设是否为必要航班存储在flight['is_required']中，如果是必要航班，则为True，否则为False
+
+# 初始化NKC_dict和NK
+NKC_dict = {}
+NK = {}
+for flight in flights:
+    origin, destination = flight['origin'], flight['destination']
+    departure_time, arrival_time = flight['departure_time'], flight['arrival_time']
+    is_required = flight['is_required']
+    for k in K:
+        if is_required:
+            # 如果是必要航班，则将其起飞节点和到达节点添加到NKC_dict和NK中
+            takeoff_node = (origin, k, departure_time)
+            landing_node = (destination, k, arrival_time)
+            if takeoff_node not in NKC_dict:
+                NKC_dict[takeoff_node] = set()
+            if landing_node not in NKC_dict:
+                NKC_dict[landing_node] = set()
+            NKC_dict[takeoff_node].add(landing_node)
+            NK[k] = NK.get(k, set()) | {takeoff_node, landing_node}
+        else:
+            # 如果不是必要航班，则只将其起飞节点添加到NK中
+            takeoff_node = (origin, k, departure_time)
+            NK[k] = NK.get(k, set()) | {takeoff_node}
+
+# 初始化L_n_plus和L_n_minus
+L_n_plus = [set() for _ in range(len(NC) * len(K) * T)]
+L_n_minus = [set() for _ in range(len(NC) * len(K) * T)]
+for n in range(len(NC) * len(K) * T):
+    i, k, t = divmod(n, len(K) * T)
+    for j in range(len(NC)):
+        if j != i:
+            # 计算正向邻居节点
+            for k_prime in K:
+                if (i, k_prime, t) in NK[k] and (j, k_prime, t + tau(i, j, k, k_prime)) in NK[k_prime]:
+                    L_n_plus[n].add(j * len(K) * T + K.index(k_prime) * T + t + tau(i, j, k, k_prime))
+            # 计算反向邻居节点
+            for k_prime in K:
+                if (j, k_prime, t) in NK[k_prime] and (i, k_prime, t - tau(j, i, k_prime, k)) in NK[k]:
+                    L_n_minus[n].add(j * len(K) * T + K.index(k_prime) * T + t - tau(j, i, k_prime, k))
+
+# 初始化q_w_plus和q_w_minus
+q_w_plus = {}
+q_w_minus = {}
+for n in range(len(NC) * len(K) * T):
+    i, k, t = divmod(n, len(K) * T)
+    for j in L_n_plus[n]:
+        j_, k_, t_ = divmod(j, len(K) * T)
+        if (i, k, t) in NKC_dict and (j_, k_, t_) in NKC_dict[(i, k, t)]:
+            q_w_plus[(n, j)] = 1 / len(NKC_dict[(i, k, t)])
+    for j in L_n_minus[n]:
+        j_, k_, t_ = divmod(j, len(K) * T)
+        if (j_, k_, t_) in NKC_dict and (i, k, t) in NKC_dict[(j_, k_, t_)]:
+            q_w_minus[(n, j)] = 1 / len(NKC_dict[(j_, k_, t_)])
+在上述代码中，我们首先创建了一个空字典NKC_dict和一个空字典NK，用于存储机型在特定节点上穿越计数时间线的节点集合和机型在时空网络中的节点集合。接着，我们遍历了所有航班，对于每个航班，根据其起飞机场、目的机场、起飞时间和到达时间，计算出该航班的起飞节点和到达节点，并将其添加到NKC_dict和NK中。然后，我们创建了两个空列表L_n_plus和L_n_minus，用于存储所有节点的正向和反向邻居节点。接着，我们遍历了所有节点，对于每个节点，计算出其正向和反向邻居节点，并将其添加到L_n_plus和L_n_minus中。最后，我们创建了两个空字典q_w_plus和q_w_minus，用于存储所有节点的正向和反向邻居节点的转移概率。接着，我们遍历了所有节点，对于每个节点，计算出其正向和反向邻居节点的转移概率，并将其添加到q_w_plus和q_w_minus中。这样，您就可以得到初始化后的NK_C、NK、L_n_plus、L_n_minus、q_w_plus和q_w_minus。
