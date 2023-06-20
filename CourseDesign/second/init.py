@@ -66,5 +66,3 @@ for flight in flightSheet:
                 landing_node_minus = (j, k, arrival_time)
                 L_n_minus[landing_node].append(landing_node_minus)
                 q_w_minus[landing_node][landing_node_minus] = flight_time(departure_time, arrival_time)
-
-print(L_n_plus)

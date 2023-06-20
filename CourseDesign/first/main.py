@@ -1,5 +1,5 @@
 import gurobipy as gp
-from CourseDesign.first.paramsFromSheet import K, p_profits, c, L,L_plus
+from CourseDesign.first.paramsFromSheet import K, p_profits, c, L, L_plus
 
 # Create the model
 model = gp.Model('Airline Profit Maximization')
